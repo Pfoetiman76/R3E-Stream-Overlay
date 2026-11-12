@@ -1,0 +1,120 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python 3.12 einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Abhaengigkeiten installieren
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller pyside6
+
+      - name: Version bestimmen
+        id: ver
+        shell: pwsh
+        run: |
+          $v = (python -c "import sys; sys.path.insert(0,'.'); from rso import APP_VERSION; print(APP_VERSION)")
+          $tag = "${{ github.ref_name }}"
+          if (-not $tag.StartsWith('v')) { $tag = "v$v" }
+          "version=$v" | Out-File -Append $env:GITHUB_OUTPUT
+          "tag=$tag" | Out-File -Append $env:GITHUB_OUTPUT
+          if ($tag -ne "v$v") {
+            Write-Host "WARNUNG: Tag $tag entspricht nicht APP_VERSION v$v (Update-Schleife moeglich)"
+          }
+
+      - name: Tests
+        shell: pwsh
+        run: |
+          python tests/run_all.py
+          if ($LASTEXITCODE -ne 0) { throw "Tests fehlgeschlagen" }
+
+      - name: Syntax-Pruefung aller Dateien (inkl. GUI-Dateien)
+        shell: pwsh
+        run: |
+          python -m py_compile overlay/main.py rso/panel.py agent/agent.py
+          if ($LASTEXITCODE -ne 0) { throw "Syntaxfehler" }
+
+      - name: Agent bauen
+        shell: pwsh
+        run: |
+          pyinstaller --noconfirm --clean --noconsole --onefile `
+            --name R3E-Stream-Agent `
+            --paths . `
+            agent/agent.py
+          if ($LASTEXITCODE -ne 0) { throw "PyInstaller Agent fehlgeschlagen" }
+
+      - name: Overlay bauen
+        shell: pwsh
+        run: |
+          pyinstaller --noconfirm --clean --noconsole --onefile `
+            --name R3E-Stream-Overlay `
+            --paths . `
+            overlay/main.py
+          if ($LASTEXITCODE -ne 0) { throw "PyInstaller Overlay fehlgeschlagen" }
+
+      - name: EXEs pruefen (fail-loud)
+        shell: pwsh
+        run: |
+          foreach ($p in @("dist/R3E-Stream-Agent.exe", "dist/R3E-Stream-Overlay.exe")) {
+            if (-not (Test-Path $p)) { throw "FEHLT: $p" }
+            if ((Get-Item $p).Length -lt 2MB) { throw "ZU KLEIN: $p ($((Get-Item $p).Length) Bytes)" }
+          }
+
+      - name: Ordnerstruktur fuer Inno
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist/agent, dist/overlay | Out-Null
+          Move-Item dist/R3E-Stream-Agent.exe dist/agent/
+          Move-Item dist/R3E-Stream-Overlay.exe dist/overlay/
+
+      - name: Inno Setup installieren
+        run: choco install innosetup -y
+
+      - name: Installer bauen
+        shell: pwsh
+        run: |
+          $v = "${{ steps.ver.outputs.version }}"
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DAppVersion=$v installer/setup_agent.iss
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DAppVersion=$v installer/setup_overlay.iss
+          foreach ($p in @("dist_installer/R3E-Stream-Agent-Setup-$v.exe",
+                           "dist_installer/R3E-Stream-Overlay-Setup-$v.exe")) {
+            if (-not (Test-Path $p)) { throw "FEHLT: $p" }
+            if ((Get-Item $p).Length -lt 2MB) { throw "ZU KLEIN: $p" }
+          }
+
+      - name: Artefakte hochladen (workflow_dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: r3e-stream-overlay-${{ steps.ver.outputs.version }}
+          path: dist_installer/*.exe
+
+      - name: Release anlegen und Assets anhaengen (nur bei Tag)
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "${{ steps.ver.outputs.tag }}"
+          $v = "${{ steps.ver.outputs.version }}"
+          gh release create $tag --title "R3E Stream-Overlay $tag" `
+            --notes "Agent (Gaming-PC) + Overlay (Streaming-PC), Version $v. Installation siehe README." `
+            --verify-tag `
+            dist_installer/R3E-Stream-Agent-Setup-$v.exe `
+            dist_installer/R3E-Stream-Overlay-Setup-$v.exe
