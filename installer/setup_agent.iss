@@ -19,7 +19,7 @@ PrivilegesRequired=lowest
 OutputDir=..\dist_installer
 
 [Files]
-Source:"dist\agent\R3E-Stream-Agent.exe"; DestDir:"{app}"; Flags: ignoreversion
+Source:"..\dist\agent\R3E-Stream-Agent.exe"; DestDir:"{app}"; Flags: ignoreversion
 
 [Tasks]
 Name: "autostart"; Description: "Agent mit Windows starten (empfohlen)"; Flags: checkedonce

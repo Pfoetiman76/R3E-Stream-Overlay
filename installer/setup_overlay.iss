@@ -19,7 +19,7 @@ PrivilegesRequired=lowest
 OutputDir=..\dist_installer
 
 [Files]
-Source:"dist\overlay\R3E-Stream-Overlay.exe"; DestDir:"{app}"; Flags: ignoreversion
+Source:"..\dist\overlay\R3E-Stream-Overlay.exe"; DestDir:"{app}"; Flags: ignoreversion
 
 [Tasks]
 Name: "autostart"; Description: "Overlay mit Windows starten (empfohlen)"; Flags: checkedonce
