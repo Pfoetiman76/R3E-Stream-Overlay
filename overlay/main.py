@@ -31,6 +31,8 @@ from rso import APP_VERSION  # noqa: E402
 from rso.history import LapHistory  # noqa: E402
 from rso.panel import Panel, qss  # noqa: E402
 from rso.protocol import DEFAULT_PORT, decode_state  # noqa: E402
+from rso.qtcompat import (CTRL, MOUSE_LEFT, WA_TRANSLUCENT_ATTRIBUTE,  # noqa: E402
+                          WINDOW_FLAGS)
 
 HIDE_TIMEOUT_S = 3.0          # ohne Pakete so lange -> Overlay ausblenden
 POLL_MS = 60                  # Hotkey-/Auto-Timer
@@ -111,10 +113,9 @@ class OverlayWindow(QWidget):
         self.scale = float(self.cfg.get("scale", 1.0))
 
         self.setWindowTitle(f"R3E Stream-Overlay {APP_VERSION}")
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint
-                            | Qt.WindowType.WindowStaysOnTopHint
-                            | Qt.WindowType.Tool)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentAttribute, True)
+        self.setWindowFlags(WINDOW_FLAGS)
+        if WA_TRANSLUCENT_ATTRIBUTE is not None:
+            self.setAttribute(WA_TRANSLUCENT_ATTRIBUTE, True)
 
         self.panel = Panel()
         lay = QVBoxLayout(self)
@@ -188,12 +189,12 @@ class OverlayWindow(QWidget):
         self.adjustSize()
 
     def mousePressEvent(self, e):
-        if e.button() == Qt.MouseButton.LeftButton:
+        if e.button() == MOUSE_LEFT:
             self._drag = e.globalPos() - self.frameGeometry().topLeft()
             e.accept()
 
     def mouseMoveEvent(self, e):
-        if e.buttons() & Qt.MouseButton.LeftButton and getattr(self, "_drag", None):
+        if e.buttons() & MOUSE_LEFT and getattr(self, "_drag", None):
             self.move(e.globalPos() - self._drag)
             e.accept()
 
@@ -203,7 +204,7 @@ class OverlayWindow(QWidget):
         save_config(self.cfg)
 
     def wheelEvent(self, e):
-        if e.modifiers() & Qt.KeyboardModifier.ControlModifier:
+        if e.modifiers() & CTRL:
             self._apply_scale(self.scale + (0.1 if e.angleDelta().y() > 0 else -0.1))
             self.cfg["scale"] = round(self.scale, 2)
             save_config(self.cfg)

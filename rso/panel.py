@@ -7,10 +7,10 @@ rso.format (Qt-frei).
 """
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QVBoxLayout, QWidget)
 
+from rso import qtcompat
 from rso.format import (delta_class, fmt_delta, fmt_fuel, fmt_lap,
                         fmt_sector, fmt_session_time)
 
@@ -36,7 +36,7 @@ def _lbl(text="", klasse="", mono=False, fett=False):
         l.setProperty("mono", True)
     if fett:
         l.setProperty("bold", True)
-    l.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+    l.setAlignment(qtcompat.ALIGN_RIGHT_VCENTER)
     return l
 
 
@@ -50,11 +50,11 @@ class Tile(QFrame):
         lay.setContentsMargins(10, 7, 10, 6)
         lay.setSpacing(0)
         self.lbl = _lbl(label, "dim")
-        self.lbl.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.lbl.setAlignment(qtcompat.ALIGN_LEFT)
         self.wert = _lbl("--", "wert", mono=True, fett=True)
-        self.wert.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.wert.setAlignment(qtcompat.ALIGN_LEFT)
         self.zusatz = _lbl("", "dim small")
-        self.zusatz.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.zusatz.setAlignment(qtcompat.ALIGN_LEFT)
         lay.addWidget(self.lbl)
         lay.addWidget(self.wert)
         lay.addWidget(self.zusatz)
@@ -84,7 +84,7 @@ class Panel(QWidget):
         klay = QHBoxLayout(kopf)
         klay.setContentsMargins(12, 7, 12, 7)
         self.strecke = _lbl("", "fett")
-        self.strecke.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.strecke.setAlignment(qtcompat.ALIGN_LEFT)
         self.live = _lbl("LIVE", "live", fett=True)
         klay.addWidget(self.strecke, 1)
         klay.addWidget(self.live)
@@ -119,7 +119,7 @@ class Panel(QWidget):
         self.sek_zellen = {}
         for i in range(3):
             nr = _lbl(f"S{i + 1}", "mono")
-            nr.setAlignment(Qt.AlignmentFlag.AlignLeft)
+            nr.setAlignment(qtcompat.ALIGN_LEFT)
             sgrid.addWidget(nr, i + 1, 0)
             self.sek_zellen[i] = {}
             for j, art in enumerate(("cur", "last", "best")):
@@ -147,7 +147,7 @@ class Panel(QWidget):
                 if j > 0:
                     z.setProperty("mono", True)
                 if j == 0:
-                    z.setAlignment(Qt.AlignmentFlag.AlignLeft)
+                    z.setAlignment(qtcompat.ALIGN_LEFT)
                 rgrid.addWidget(z, i + 1, j)
                 zellen.append(z)
             self.rund_zeilen.append(zellen)

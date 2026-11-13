@@ -47,13 +47,13 @@ jobs:
       - name: Syntax-Pruefung aller Dateien (inkl. GUI-Dateien)
         shell: pwsh
         run: |
-          python -m py_compile overlay/main.py rso/panel.py agent/agent.py
+          python -m py_compile overlay/main.py rso/panel.py rso/qtcompat.py agent/agent.py
           if ($LASTEXITCODE -ne 0) { throw "Syntaxfehler" }
 
       - name: PySide6-Smoketest (Enums + Importe)
         shell: pwsh
         run: |
-          python -c "import sys; sys.path.insert(0, '.'); from PySide6.QtCore import Qt; Qt.WidgetAttribute.WA_TranslucentAttribute; Qt.WindowType.FramelessWindowHint; Qt.AlignmentFlag.AlignRight; import overlay.main; import rso.panel; print('PySide6-Smoketest OK')"
+          python -c "import sys; sys.path.insert(0, '.'); import PySide6; print('PySide6', PySide6.__version__); import rso.qtcompat; import overlay.main; import rso.panel; print('PySide6-Smoketest OK')"
           if ($LASTEXITCODE -ne 0) { throw "PySide6-Smoketest fehlgeschlagen" }
 
       - name: Agent bauen

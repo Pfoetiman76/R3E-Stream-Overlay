@@ -64,5 +64,6 @@ Release: Tag `v<APP_VERSION>` auf `main` → GitHub Actions baut beide Installer
 
 ## Versionshistorie
 
+- **0.1.2** — Fix: neue Qt-Enum-Kompatibilitätsschicht `rso/qtcompat.py` löst Fenster- und Ausrichtungskonstanten versionsunabhängig auf (behebt den CI-Fehler „WidgetAttribute has no attribute WA_TranslucentAttribute“ unter PySide6 6.12); CI-Smoketest prüft jetzt die Kompatibilitätsschicht und meldet die PySide6-Version.
 - **0.1.1** — Fix: voll qualifizierte PySide6-Enums (Absturz des Overlay beim Fenster-Attribut behoben); CI: PySide6-Smoketest ergänzt.
 - **0.1.0** — Erste Version: Agent (10 Hz, UDP-Broadcast, Idle-Herzschlag), Overlay (Kacheln, Sektoren, Rundenliste, Hotkey F8, Drag/Skalierung, Auto-Ausblendung), CI mit zwei Installern.
