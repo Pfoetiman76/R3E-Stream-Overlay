@@ -15,7 +15,8 @@ Compression=lzma2
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=lowest
-Output=dist_installer
+; Output ist relativ zu dieser .iss-Datei (Ordner installer\):
+Output=..\dist_installer
 
 [Files]
 Source:"dist\agent\R3E-Stream-Agent.exe"; DestDir:"{app}"; Flags: ignoreversion

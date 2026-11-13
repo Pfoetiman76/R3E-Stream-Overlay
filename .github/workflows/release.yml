@@ -89,9 +89,15 @@ jobs:
       - name: Installer bauen
         shell: pwsh
         run: |
+          $ErrorActionPreference = 'Continue'
+          $PSNativeCommandUseErrorActionPreference = $false
           $v = "${{ steps.ver.outputs.version }}"
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DAppVersion=$v installer/setup_agent.iss
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DAppVersion=$v installer/setup_overlay.iss
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { throw "ISCC nicht gefunden: $iscc" }
+          & $iscc /DAppVersion=$v installer/setup_agent.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC Agent fehlgeschlagen (Exit $LASTEXITCODE)" }
+          & $iscc /DAppVersion=$v installer/setup_overlay.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC Overlay fehlgeschlagen (Exit $LASTEXITCODE)" }
           foreach ($p in @("dist_installer/R3E-Stream-Agent-Setup-$v.exe",
                            "dist_installer/R3E-Stream-Overlay-Setup-$v.exe")) {
             if (-not (Test-Path $p)) { throw "FEHLT: $p" }
