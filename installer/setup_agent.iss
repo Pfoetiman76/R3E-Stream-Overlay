@@ -10,13 +10,13 @@ AppName=R3E Stream-Overlay Agent
 AppVersion={#AppVersion}
 DefaultDirName={autopf}\R3E Stream-Overlay Agent
 DefaultGroupName=R3E Stream-Overlay Agent
-OutputBaseName=R3E-Stream-Agent-Setup-{#AppVersion}
+OutputBaseFilename=R3E-Stream-Agent-Setup-{#AppVersion}
 Compression=lzma2
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=lowest
-; Output ist relativ zu dieser .iss-Datei (Ordner installer\):
-Output=..\dist_installer
+; OutputDir ist relativ zu dieser .iss-Datei (Ordner installer\):
+OutputDir=..\dist_installer
 
 [Files]
 Source:"dist\agent\R3E-Stream-Agent.exe"; DestDir:"{app}"; Flags: ignoreversion

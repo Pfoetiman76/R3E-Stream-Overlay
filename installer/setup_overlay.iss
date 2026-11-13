@@ -10,13 +10,13 @@ AppName=R3E Stream-Overlay
 AppVersion={#AppVersion}
 DefaultDirName={autopf}\R3E Stream-Overlay
 DefaultGroupName=R3E Stream-Overlay
-OutputBaseName=R3E-Stream-Overlay-Setup-{#AppVersion}
+OutputBaseFilename=R3E-Stream-Overlay-Setup-{#AppVersion}
 Compression=lzma2
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=lowest
-; Output ist relativ zu dieser .iss-Datei (Ordner installer\):
-Output=..\dist_installer
+; OutputDir ist relativ zu dieser .iss-Datei (Ordner installer\):
+OutputDir=..\dist_installer
 
 [Files]
 Source:"dist\overlay\R3E-Stream-Overlay.exe"; DestDir:"{app}"; Flags: ignoreversion
