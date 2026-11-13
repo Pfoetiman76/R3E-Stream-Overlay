@@ -119,8 +119,15 @@ jobs:
         run: |
           $tag = "${{ steps.ver.outputs.tag }}"
           $v = "${{ steps.ver.outputs.version }}"
-          gh release create $tag --title "R3E Stream-Overlay $tag" `
-            --notes "Agent (Gaming-PC) + Overlay (Streaming-PC), Version $v. Installation siehe README." `
-            --verify-tag `
-            dist_installer/R3E-Stream-Agent-Setup-$v.exe `
-            dist_installer/R3E-Stream-Overlay-Setup-$v.exe
+          gh release view $tag 2>$null | Out-Null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag --title "R3E Stream-Overlay $tag" `
+              --notes "Agent (Gaming-PC) + Overlay (Streaming-PC), Version $v. Installation siehe README." `
+              --verify-tag
+            if ($LASTEXITCODE -ne 0) { throw "Release anlegen fehlgeschlagen (Exit $LASTEXITCODE)" }
+          } else {
+            Write-Host "Release $tag existiert bereits - Assets werden ergaenzt."
+          }
+          gh release upload $tag dist_installer/R3E-Stream-Agent-Setup-$v.exe `
+            dist_installer/R3E-Stream-Overlay-Setup-$v.exe --clobber
+          if ($LASTEXITCODE -ne 0) { throw "Assets hochladen fehlgeschlagen (Exit $LASTEXITCODE)" }
