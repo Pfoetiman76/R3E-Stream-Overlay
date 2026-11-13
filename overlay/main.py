@@ -111,9 +111,10 @@ class OverlayWindow(QWidget):
         self.scale = float(self.cfg.get("scale", 1.0))
 
         self.setWindowTitle(f"R3E Stream-Overlay {APP_VERSION}")
-        self.setWindowFlags(Qt.FramelessWindowHint
-                            | Qt.WindowStaysOnTopHint | Qt.Tool)
-        self.setAttribute(Qt.WA_TranslucentAttribute, True)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint
+                            | Qt.WindowType.WindowStaysOnTopHint
+                            | Qt.WindowType.Tool)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentAttribute, True)
 
         self.panel = Panel()
         lay = QVBoxLayout(self)
@@ -187,12 +188,12 @@ class OverlayWindow(QWidget):
         self.adjustSize()
 
     def mousePressEvent(self, e):
-        if e.button() == Qt.LeftButton:
+        if e.button() == Qt.MouseButton.LeftButton:
             self._drag = e.globalPos() - self.frameGeometry().topLeft()
             e.accept()
 
     def mouseMoveEvent(self, e):
-        if e.buttons() & Qt.LeftButton and getattr(self, "_drag", None):
+        if e.buttons() & Qt.MouseButton.LeftButton and getattr(self, "_drag", None):
             self.move(e.globalPos() - self._drag)
             e.accept()
 
@@ -202,7 +203,7 @@ class OverlayWindow(QWidget):
         save_config(self.cfg)
 
     def wheelEvent(self, e):
-        if e.modifiers() & Qt.ControlModifier:
+        if e.modifiers() & Qt.KeyboardModifier.ControlModifier:
             self._apply_scale(self.scale + (0.1 if e.angleDelta().y() > 0 else -0.1))
             self.cfg["scale"] = round(self.scale, 2)
             save_config(self.cfg)

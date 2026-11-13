@@ -36,7 +36,7 @@ def _lbl(text="", klasse="", mono=False, fett=False):
         l.setProperty("mono", True)
     if fett:
         l.setProperty("bold", True)
-    l.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+    l.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
     return l
 
 
@@ -50,11 +50,11 @@ class Tile(QFrame):
         lay.setContentsMargins(10, 7, 10, 6)
         lay.setSpacing(0)
         self.lbl = _lbl(label, "dim")
-        self.lbl.setAlignment(Qt.AlignLeft)
+        self.lbl.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.wert = _lbl("--", "wert", mono=True, fett=True)
-        self.wert.setAlignment(Qt.AlignLeft)
+        self.wert.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.zusatz = _lbl("", "dim small")
-        self.zusatz.setAlignment(Qt.AlignLeft)
+        self.zusatz.setAlignment(Qt.AlignmentFlag.AlignLeft)
         lay.addWidget(self.lbl)
         lay.addWidget(self.wert)
         lay.addWidget(self.zusatz)
@@ -84,7 +84,7 @@ class Panel(QWidget):
         klay = QHBoxLayout(kopf)
         klay.setContentsMargins(12, 7, 12, 7)
         self.strecke = _lbl("", "fett")
-        self.strecke.setAlignment(Qt.AlignLeft)
+        self.strecke.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.live = _lbl("LIVE", "live", fett=True)
         klay.addWidget(self.strecke, 1)
         klay.addWidget(self.live)
@@ -119,7 +119,7 @@ class Panel(QWidget):
         self.sek_zellen = {}
         for i in range(3):
             nr = _lbl(f"S{i + 1}", "mono")
-            nr.setAlignment(Qt.AlignLeft)
+            nr.setAlignment(Qt.AlignmentFlag.AlignLeft)
             sgrid.addWidget(nr, i + 1, 0)
             self.sek_zellen[i] = {}
             for j, art in enumerate(("cur", "last", "best")):
@@ -147,7 +147,7 @@ class Panel(QWidget):
                 if j > 0:
                     z.setProperty("mono", True)
                 if j == 0:
-                    z.setAlignment(Qt.AlignLeft)
+                    z.setAlignment(Qt.AlignmentFlag.AlignLeft)
                 rgrid.addWidget(z, i + 1, j)
                 zellen.append(z)
             self.rund_zeilen.append(zellen)
